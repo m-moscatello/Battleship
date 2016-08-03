@@ -2,23 +2,17 @@ package view;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.BevelBorder;
 
-import model.Ship;
-import model.ShipType;
-
 public class View{
 	private JFrame frame;
-	private JPanel player1panel;
-	private JPanel player2panel;
+	private JPanel playerPanel;
+	private JPanel aiPanel;
 	private JPanel panel;
 	private JLabel textLabel;
 	
@@ -27,8 +21,28 @@ public class View{
 	private JButton btnRageQuit;
 	private JButton btnQuitGame;
 	
-	public JPanel[][] player1polje;
-	public JPanel[][] player2polje;
+	private JPanel[][] playerCells;
+	private JPanel[][] aiCells;
+	
+	private JPanel player1field;
+	private JPanel player2field;
+	
+	//slike za prikazati u panelu
+	public static BufferedImage MISS;
+	public static BufferedImage EXPLOSION;
+	
+	
+	//static block, da bi se te static varijable za slike mogle inicijalizirat 
+	//to se pozove kad se uloada klasa	
+	static{
+		try {
+			//valjda taj class loader od klase zna gdje tražiti slike, vrati stream preko kojeg se mogu èitati byte-ovi od slike
+			EXPLOSION = ImageIO.read(View.class.getResourceAsStream("explosion.png"));
+			MISS = ImageIO.read(View.class.getResourceAsStream("miss.png"));
+		} catch (IOException ex) {
+			System.err.println(ex.getMessage());
+		}
+	}
 	
 	public View() {
 		makeFrame();
@@ -41,9 +55,8 @@ public class View{
 		frame.setSize(800, 600);
 		frame.getContentPane().setBackground(new Color(0, 191, 255));
 		frame.getContentPane().setLayout(new BorderLayout());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
 		
-		BufferedImage bg_img = null;
 		/*try {
 			bg_img = ImageIO.read(new File("bg.jpg"));
 		} catch(IOException e) {
@@ -56,6 +69,7 @@ public class View{
 		/*try {
 			frame.setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("bg.jpg")))));
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
 		
@@ -118,13 +132,13 @@ public class View{
 	}
 	
 	public void showGame() {
-		player1panel = new JPanel();
-		player1panel.setBackground(Color.CYAN);
-		player1panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.BLACK));
+		playerPanel = new JPanel();
+		playerPanel.setBackground(Color.CYAN);
+		playerPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.BLACK));
 		
-		player2panel = new JPanel();
-		player2panel.setBackground(Color.CYAN);
-		player2panel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
+		aiPanel = new JPanel();
+		aiPanel.setBackground(Color.CYAN);
+		aiPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
 		
 		panel = new JPanel();
 		panel.setOpaque(false);
@@ -134,7 +148,7 @@ public class View{
 		
 		btnQuitGame = new JButton("Quit game");
 		
-		textLabel = new JLabel("Welcome to a game of Battleship!");
+		textLabel = new JLabel("<html>Welcome to a game of Battleship!</html>");
 		textLabel.setOpaque(true);
 		textLabel.setBackground(Color.WHITE);
 		textLabel.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -144,9 +158,9 @@ public class View{
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(player1panel, GroupLayout.PREFERRED_SIZE, 392, GroupLayout.PREFERRED_SIZE)
+					.addComponent(playerPanel, GroupLayout.PREFERRED_SIZE, 392, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(player2panel, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
+					.addComponent(aiPanel, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
 				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(textLabel, GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
@@ -160,13 +174,13 @@ public class View{
 					.addComponent(panel, GroupLayout.DEFAULT_SIZE, 768, Short.MAX_VALUE)
 					.addContainerGap())
 		);
-		player1panel.setBackground(Color.CYAN);
+		playerPanel.setBackground(Color.CYAN);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(player2panel, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
-						.addComponent(player1panel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE))
+						.addComponent(aiPanel, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
+						.addComponent(playerPanel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
@@ -179,8 +193,8 @@ public class View{
 					.addContainerGap())
 		);
 		
-		JPanel player2field = new JPanel();
-		GroupLayout gl_player2panel = new GroupLayout(player2panel);
+		player2field = new JPanel();
+		GroupLayout gl_player2panel = new GroupLayout(aiPanel);
 		gl_player2panel.setHorizontalGroup(
 			gl_player2panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(Alignment.TRAILING, gl_player2panel.createSequentialGroup()
@@ -195,10 +209,10 @@ public class View{
 					.addComponent(player2field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(41, Short.MAX_VALUE))
 		);
-		player2panel.setLayout(gl_player2panel);
+		aiPanel.setLayout(gl_player2panel);
 		
-		JPanel player1field = new JPanel();
-		GroupLayout gl_player1panel = new GroupLayout(player1panel);
+		player1field = new JPanel();
+		GroupLayout gl_player1panel = new GroupLayout(playerPanel);
 		gl_player1panel.setHorizontalGroup(
 			gl_player1panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_player1panel.createSequentialGroup()
@@ -213,46 +227,44 @@ public class View{
 					.addComponent(player1field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(46, Short.MAX_VALUE))
 		);
-		player1panel.setLayout(gl_player1panel);
+		playerPanel.setLayout(gl_player1panel);
 		
-		player1polje = new JPanel[10][10];
-		player1field.setLayout(new GridLayout(10, 10));
+		playerCells = new JPanel[10][10];
+		player1field.setLayout(new GridLayout(10, 10));		
 		
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++){
-				player1polje[i][j] = new JPanel();
-				player1polje[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-				player1polje[i][j].setBackground(Color.BLUE);
-				player1polje[i][j].setPreferredSize(new Dimension(37, 37));
-				player1field.add(player1polje[i][j]);
-				player1polje[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+				//umjesto obiènog panela napravi ImagePanel jer taj zna iscrtati sliku
+				ImagePanel panel = new ImagePanel();
+				//namjesti mu i koordinate, da se ne treba kroz cijelo polje tražiti na kojoj je poziciji taj panel
+				//npr. u MouseClicked preko (ImagePanel)event.getSource(), dobiješ taj panel i getCoords() ti vrati koordinate
+				panel.setCoords(i, j);
+				playerCells[i][j] = panel;
+				playerCells[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+				playerCells[i][j].setBackground(SEA_COLOR);
+				playerCells[i][j].setPreferredSize(new Dimension(37, 37));
+				player1field.add(playerCells[i][j]);
+				playerCells[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			}
 		}
 		
-		player2polje = new JPanel[10][10];
+		aiCells = new JPanel[10][10];
 		player2field.setLayout(new GridLayout(10, 10));
 		
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++){
-				player2polje[i][j] = new JPanel();
-				player2polje[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-				player2polje[i][j].setBackground(Color.BLUE);
-				player2polje[i][j].setPreferredSize(new Dimension(37, 37));
-				player2field.add(player2polje[i][j]);
-				player2polje[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+				ImagePanel panel = new ImagePanel();
+				panel.setCoords(i, j);
+				aiCells[i][j]=panel;
+				aiCells[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+				aiCells[i][j].setBackground(SEA_COLOR);
+				aiCells[i][j].setPreferredSize(new Dimension(37, 37));
+				player2field.add(aiCells[i][j]);
+				aiCells[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			}
 		}
 		
 		frame.getContentPane().setLayout(groupLayout);
-	}
-	
-	//TODO: adds a ship button to panel
-	public ShipButton addShipButton(Ship ship){
-		//create new ship button
-		ShipButton button = new ShipButton(ship);
-		panel.add(button);
-		//return so controller can add listener to button
-		return button;
 	}
 	
 	public String showDialogBox() {
@@ -262,12 +274,25 @@ public class View{
 			s = (String)JOptionPane.showInputDialog(
 					frame,
 					"Unesite ime:",
-					"Unos imena igraÄa",
+					"Unos imena igraèa",
 					JOptionPane.PLAIN_MESSAGE);
 		}
 		while(s.isEmpty());
 		
 		return s;
+	}
+	
+	public int chooseShipOrientation(){
+		Object[] options = {"Horizontal",
+                "Vertical"};
+		return JOptionPane.showOptionDialog(frame,
+		"",
+		"Choose ship orientation",
+		JOptionPane.YES_NO_CANCEL_OPTION,
+		JOptionPane.QUESTION_MESSAGE,
+		null,
+		options,
+		options[0]);
 	}
 	
 	public JFrame getFrame() {
@@ -292,5 +317,28 @@ public class View{
 	
 	public JButton getBtnRageQuit() {
 		return btnRageQuit;
+	}
+	
+	//ovdje su definirane boje koje æe biti background od æelija
+	public static final Color SEA_COLOR = Color.BLUE;
+	public static final Color AVAILABLE_TO_PLACE_COLOR = Color.GREEN;
+	public static final Color NOT_AVAILABLE_TO_PLACE_COLOR = Color.RED;
+	public static final Color MOUSE_OVER_COLOR = Color.YELLOW;	
+	
+	public JPanel getButtonPanel(){
+		return panel;
+	}
+	
+	//treba kontroleru da bi preko koordinate mogao naæi æeliju i mijenjati izgled
+	public JPanel getAICellPanelByXY(int x, int y){
+		return aiCells[x][y];
+	}
+	
+	public JPanel[][] getPlayerCells(){
+		return playerCells;
+	}
+	
+	public JPanel[][] getAiCells(){
+		return aiCells;
 	}
 }

@@ -12,9 +12,6 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-
-import model.*;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
 
@@ -24,8 +21,6 @@ public class Game {
 	private JPanel player1panel;
 	private JPanel player2panel;
 	private JPanel panel;
-	
-	private Player player1;
 
 	/**
 	 * Launch the application.

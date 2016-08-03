@@ -14,18 +14,13 @@ public class ShipButton extends JButton {
 	
 	public ShipButton(Ship ship){
 		super();
-		
-		//TODO: implement graphics, just for test
-		String name="";
-		for(int i=0; i<ship.getSize(); i++)
-			name+="O";
-		
-		setText(name);
+		setText(ship.getName());
+		setBackground(ship.getType().getColor());
 		
 		this.ship=ship;
 	}
 	
 	public Ship getShip(){
 		return ship;
-	}
+	}	
 }

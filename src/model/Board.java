@@ -1,118 +1,130 @@
 package model;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-//model class to represent board and its state
-public class Board {	
-	private Dot[][] board; 
-	//size for x and y, same for both
-	private int boardSize;
+public class Board {
+	//dvodimenzinalno polje "modela"
+	private Cell[][] cells; 
+	private int x;
+	private int y;	
 	
-	//TODO: M: Changed to public because of Player attributes
-	public Board(int boardSize){
-		this.boardSize=boardSize;
+	public Board(int x, int y){
+		this.x=x;
+		this.y=y;
+		cells = new Cell[x][y];
 		
-		board = new Dot[boardSize][boardSize];
+		init();
+	}
+	
+	//x i y bi bile kao duljine za to dvodimenzionalno polje, ali je negdje hardkodirano 10,10 pa nema neke koristi
+	public int getX(){
+		return x;
+	}
+	
+	public int getY(){
+		return y;
+	}
+	
+	//koristi se lista za dostupne æelije za raspored da se ne bi svaki put kad se želi smjestiti
+	//brod moralo gledati kroz polje u 2 for petlje
+	protected List<Cell> availableHorizontal = new ArrayList<Cell>();
+	protected List<Cell> availableVertical = new ArrayList<Cell>();
+	
+	//ovo je za AI board kontroller, isto da se ne bi koristile 2 for petlje
+	//ima sve æelije koje se mogu gaðati (Dot im je SEA ili SHIP)
+	protected List<Cell> availableCellsToShoot = new ArrayList<Cell>();
+	
+	//spreme se svi hitovi na ploèi, da se ne bi koristile 2 for petlje, kad se gleda da li je æelija pogodðena
+	protected List<Cell> hits = new ArrayList<Cell>();
+	
+	public void addHit(Cell hit){
+		hits.add(hit);
+	}
+	
+	//contains metoda od liste provjeri da li ta instanca iz parametra postoji u listi
+	public boolean cellHit(Cell cell){
+		return hits.contains(cell);
+	}
+	
+	//ovu metodu koristi samo AI kontroller da bi provjerio da li se može gaðati æelija
+	public boolean availableToShoot(Cell cell){
+		//vjerojatno bi se mogla æelija iz parametra provjeravati bez da se
+		//traži po koordinatama æelija iz modela u dvodimenzioalnom polju
+		Cell originalCell = cells[cell.getX()][cell.getY()];
 		
-		//initialize each field to SEA
-		for(int i=0; i<boardSize; i++) {
-			for(int j=0; j<boardSize; j++) {
-				board[i][j] = Dot.SEA;				
+		//ako je Dot SEA ili SHIP, može se gaðati, HIT i MISS znaèe da su veæ uklonjeni listeneri sa æelije
+		//pa se ne može nju gaðati više
+		if(originalCell.getDot()==Dot.SEA || originalCell.getDot()==Dot.SHIP)
+			return true;
+		return false;
+		//return availableCellsToShoot.contains(cell);		
+	}
+
+	//ove dve metode ispod koristi samo AI kontroler da bi mogao random smjestiti brodove na AI board	
+	//ako ima koja slobodna æelija, vrati random æeliju iz availableHorizontal liste
+	//random index je od 0 do velièine liste odabran preko Random klase
+	public Cell getRandomAvailableHorizontal(){
+		if(availableHorizontal.size()==0)
+			return null;
+		int randomPos = new Random().nextInt(availableHorizontal.size());
+		return availableHorizontal.get(randomPos);
+	}
+	
+	//ako ima koja slobodna æelija, vrati random æeliju iz availableVertical liste
+	//random index je od 0 do velièine liste odabran preko Random klase
+	public Cell getRandomAvailableVertical(){
+		if(availableVertical.size()==0)
+			return null;
+		int randomPos = new Random().nextInt(availableVertical.size());
+		return availableVertical.get(randomPos);
+	}
+	
+	//kad AI uništi brod, ili je poèeo game, onda random gaða æelije, tako da se uzme iz liste æelija po random indeksu
+	public Cell getRandomCell(){
+		int randomPos = new Random().nextInt(availableCellsToShoot.size());
+		return availableCellsToShoot.get(randomPos);
+	} 
+	
+	//kad se pogodi dio ship-a, onda se makne æelija iz liste, da AI više ne bi nju gaðao
+	public void removeAvailableCellToShoot(Cell cell){		
+		availableCellsToShoot.remove(cell);
+	}
+	
+	public Cell[][] getCells(){
+		return cells;
+	}
+	
+	//samo za debug
+	public void dumpAvailableCells(){
+		for(Cell cell: availableCellsToShoot){
+			System.out.println(cell);
+		}
+	}
+	
+	//kad se brod smjesti na neku poziciju, onda se iz ove dve liste uklone sve æelije koje je brod zauzeo
+	//ovo koristi samo AI kontroller
+	public void removeAvailableCell(Cell cell){
+		availableHorizontal.remove(cell);
+		availableVertical.remove(cell);
+	}
+	
+	//inicijalizira se dvodimenzionalno polje, i u liste za pomoæ AI kontroleru, se ubace sve æelije iz modela
+	protected void init(){
+		for(int i=0; i<this.x;i++){
+			for(int j=0; j<this.y;j++){	
+				Cell cell = new Cell(i, j, Dot.SEA, null);
+				cells[i][j]=cell;
+				availableHorizontal.add(cell);
+				availableVertical.add(cell);	
+				availableCellsToShoot.add(cell);
 			}
 		}
 	}
 	
-	//tries to place ship, returns false if cannot place, true if placed
-	//changes cell value from SEA to SHIP if ship is placed in that cell
-	public boolean place(int x, int y, int size, Orientation orientation){
-		//attempt to place vertically
-		if(orientation==Orientation.VERTICAL) {
-			//check if enough space to place ship vertically
-			if(x+size > boardSize) {
-				System.out.println("No space vertically");
-				return false;
-			}
-			
-			//check if there's a ship on the way
-			for(int i=x; i<size; i++) {
-				if(board[i][y]==Dot.SHIP) {
-					System.out.println("Cannot place over ship");
-					return false;
-				}
-			}
-			
-			//place vertically
-			System.out.println("Place vertically");
-			for(int i=x; i<size+x;i++){
-				board[i][y]=Dot.SHIP;
-			}
-			
-		//attempt to place horizontally
-		}else if(orientation==Orientation.HORIZONTAL){
-			//check if enough space to place ship horizontally
-			if(y+size > boardSize) {
-				System.out.println("No space horizontally");
-				return false;
-			}
-			
-			//check if there's a ship on the way
-			for(int i=y; i<size; i++) {
-				if(board[x][i]==Dot.SHIP) {
-					System.out.println("Cannot place over ship");
-					return false;
-				}
-			}
-			
-			//place horizontally
-			System.out.println("Place horizontally");
-			for(int i=y; i<size+y;i++) {
-				board[x][i]=Dot.SHIP;
-			}
-		}
-		
-		//TODO: Q: ÄŒemu ova petlja?
-		/*for(int i=x; i<boardSize;i++) {
-			for(int j=y; j<boardSize;j++) {	
-				if(board[i][j]==Dot.SHIP) {
-					System.out.println("Cannot place");
-					return false;					
-				}
-			}
-		}*/	
-		
-		return true;
-	}
-	
-	//test method, draws field for console output
-	public void drawBoard() {
-		for(int i=0; i<boardSize;i++) {
-			for(int j=0; j<boardSize;j++) {	
-				if(board[i][j]==Dot.SHIP)
-					System.out.print("[X]");
-				else
-					System.out.print("[ ]");
-			}
-			System.out.println();
-		}			
-	}
-	
-	
-	/*public static void main(String[] args){
-		Board b = new Board(10,10);
-
-		//test place
-		b.place(0, 0, 5, Orientation.VERTICAL);			
-		b.place(1, 2, 3, Orientation.HORIZONTAL);
-		b.place(1, 9, 6, Orientation.VERTICAL);
-		
-		b.place(0, 3, 5, Orientation.VERTICAL);
-		b.place(0, 8, 5, Orientation.HORIZONTAL);
-		
-		b.drawBoard();
-		
-		/*boolean val = b.place(1, 2, 3, Orientation.HORIZONTAL);
-		val = b.place(1, 0, 4, Orientation.VERTICAL);
-		val = b.place(0, 0, 3, Orientation.VERTICAL);
-		
-		String s = "";*/
-		
+	//u mouse listenerima se preko koordinata spremljenih u ImagePanel-u, naðe preko ove metode model
+	public Cell getByXY(int x, int y){		
+		return cells[x][y];
+	}	
 }
 
