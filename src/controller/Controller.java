@@ -40,8 +40,10 @@ public class Controller {
 	private int mouseWheelMoveCounter=0;
 	
 	//služi da se iskljuèe mouse listeneri na ai ploèi
-	private boolean aiBoardListenersDisabled=false;
+	private boolean aiBoardListenersDisabled=true;
 	//služi da se iskljuèe listeneri na player ploèi, iskljuèi se kad player sve brodove doda na ploèu
+	//isto su listeneri iskljuèeni kad game poène, i kad smjesti brod
+	//ukljuèe se kad je player na potezu i kad je odabrao brod za smještanje na ploèu
 	private boolean playerBoardListenersDisabled=true;
 	
 	public Controller(View view) {
@@ -109,6 +111,8 @@ public class Controller {
 			}
 		};
 		
+		//aninimna klasa, nema naziv nego se kod kompajliranja kreira .class file Controller$1.class
+		//format %naziv glavne klase u kojoj je definirana anonimna%${po redoslijedu broj anonimne klase}.class
 		mPlayerBoardListener = new MouseListener() {
 
 			@Override
@@ -304,7 +308,10 @@ public class Controller {
 	}
 	
 	public void startBtnPressed() {
+		//disablaj listenere na AI ploèi
 		aiBoardListenersDisabled=true;
+		
+		//kad ideš na "Quit game", i opet na "Start game", onda se svi view-ovi ponovno naprave, i stari s te dve metode ispod uklone
 		this.view.getFrame().getContentPane().removeAll();
 		this.view.getFrame().getContentPane().repaint();
 		this.view.showGame();
@@ -329,6 +336,8 @@ public class Controller {
 		view.getFrame().addMouseWheelListener(mWListener);
 		//reci playeru preko labele da doda svoje brodove na ploèu
 		updateLog("Place your ships");
+		
+		reset();
 	}
 	
 	public void exitBtnPressed() {
@@ -397,6 +406,7 @@ public class Controller {
 				panel.setBackground(View.SEA_COLOR);
 			}						
 			break;
+		//ako ovo odkomentiraš vidiš gdje je AI dodao brodove
 		/*case SHIP:
 			panel.removeImage();
 			Color color = cell.getShip().getType().getColor();
@@ -438,10 +448,6 @@ public class Controller {
 		}
 	}
 	
-	//mijenja background i sliku za æeliju iz parametra funkcije, za ploèu od playera-ja, 
-		// 1. na kojoj AI gaða brodove
-		// 2. na kojoj player smješta svoje brodove
-		// za oba 2 sluèaja se poziva ova funkcija	
 	
 	/***
 	 * mijenja background i sliku za æeliju iz parametra funkcije, za ploèu od playera-ja, 
@@ -782,6 +788,7 @@ public class Controller {
 		};
 		
 		//treba nam novi thread, ima za parametar Runnable a u aiTurnTask smo dodali kod za AI-ja
+		//mora kod od AI-a bit u novom threadu da se ne bi blokiralo korisnièko suèelje
 		Thread t = new Thread(aiTurnTask);
 		//treba pokrenuti thread
 		t.start();
@@ -848,7 +855,7 @@ public class Controller {
 		//makni poèetni <html> tag
 		String filtered = current.replace("<html>", "");
 		//makni završni </html> tag
-		filtered = current.replace("</html>", "");
+		filtered = current.replace("</html>", ""); 
 		
 		//dodaj na poèetak labele novi tekst, i zalijepi <html> tagove
 		view.getTextLabel().setText("<html>"+text+"<br>"+filtered+"</html>");
@@ -859,5 +866,10 @@ public class Controller {
 		if(Math.random()>0.5)
 			return 1;
 		return 0;
+	}
+	
+	public void reset(){
+		playerBoardController.reset();
+		aiBoardController.reset();		
 	}
 }

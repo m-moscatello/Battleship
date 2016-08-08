@@ -14,7 +14,7 @@ public class Board {
 		this.y=y;
 		cells = new Cell[x][y];
 		
-		init();
+		//init();
 	}
 	
 	//x i y bi bile kao duljine za to dvodimenzionalno polje, ali je negdje hardkodirano 10,10 pa nema neke koristi
@@ -110,11 +110,16 @@ public class Board {
 	}
 	
 	//inicijalizira se dvodimenzionalno polje, i u liste za pomoæ AI kontroleru, se ubace sve æelije iz modela
-	protected void init(){
+	public void init(){
+		availableHorizontal.clear();
+		availableVertical.clear();
+		availableCellsToShoot.clear();
+		
 		for(int i=0; i<this.x;i++){
 			for(int j=0; j<this.y;j++){	
 				Cell cell = new Cell(i, j, Dot.SEA, null);
 				cells[i][j]=cell;
+				
 				availableHorizontal.add(cell);
 				availableVertical.add(cell);	
 				availableCellsToShoot.add(cell);

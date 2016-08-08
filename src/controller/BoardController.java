@@ -157,4 +157,10 @@ public class BoardController {
 		}
 		return false;
 	}
+	
+	public void reset(){
+		System.out.println("Reset");
+		ships.clear();
+		board.init();
+	}
 }
