@@ -5,6 +5,7 @@ import controller.*;
 
 public class Main {
 	public static void main(String[] args) {
+		//test komentar
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {				
 				View view = new View();				
