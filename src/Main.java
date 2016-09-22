@@ -1,19 +1,20 @@
 import javax.swing.SwingUtilities;
 
-import model.*;
-import view.*;
-import controller.*;
+import controller.Controller;
+import view.View;
 
 public class Main {
+
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				Player player1 = new Player();
+			public void run() {				
 				View view = new View();
-				Controller c = new Controller(player1, view);
+				Controller controller;
 				
-				c.control();
+				controller = new Controller(view);
+				controller.control();
 			}
 		});
 	}
+
 }

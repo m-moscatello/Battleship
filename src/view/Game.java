@@ -1,31 +1,21 @@
 package view;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-
-import model.*;
-import java.awt.GridLayout;
+import javax.swing.JLabel;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Font;
 
 public class Game {
 
 	private JFrame frame;
-	private JPanel player1panel;
-	private JPanel player2panel;
-	private JPanel panel;
-	
-	private Player player1;
 
 	/**
 	 * Launch the application.
@@ -55,141 +45,135 @@ public class Game {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setSize(800, 600);
+		frame.setResizable(false);
+		frame.setBounds(100, 100, 800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
 		
-		player1panel = new JPanel();
-		player1panel.setBackground(Color.CYAN);
+		JPanel player1panel = new JPanel();
+		player1panel.setBounds(0, 0, 395, 418);
 		player1panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.BLACK));
-		
-		player2panel = new JPanel();
-		player2panel.setBackground(Color.CYAN);
-		player2panel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
-		
-		panel = new JPanel();
-		panel.setOpaque(false);
-		panel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.BLACK));
-		
-		JButton btnRageQuit = new JButton("Rage quit!");
-		
-		JButton btnQuitGame = new JButton("Quit game");
-		
-		JLabel label = new JLabel("Welcome to a game of Battleship!");
-		label.setOpaque(true);
-		label.setBackground(Color.WHITE);
-		label.setBorder(BorderFactory.createLoweredBevelBorder());
-		label.setHorizontalAlignment(SwingConstants.LEFT);
-		label.setVerticalAlignment(SwingConstants.TOP);
-		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(player1panel, GroupLayout.PREFERRED_SIZE, 392, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(player2panel, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(label, GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(btnQuitGame, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnRageQuit, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addContainerGap())
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panel, GroupLayout.DEFAULT_SIZE, 768, Short.MAX_VALUE)
-					.addContainerGap())
-		);
-		player1panel.setBackground(Color.CYAN);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(player2panel, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
-						.addComponent(player1panel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnQuitGame)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnRageQuit))
-						.addComponent(label, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
-		);
-		
-		JPanel player2field = new JPanel();
-		GroupLayout gl_player2panel = new GroupLayout(player2panel);
-		gl_player2panel.setHorizontalGroup(
-			gl_player2panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_player2panel.createSequentialGroup()
-					.addContainerGap(32, Short.MAX_VALUE)
-					.addComponent(player2field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addGap(30))
-		);
-		gl_player2panel.setVerticalGroup(
-			gl_player2panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_player2panel.createSequentialGroup()
-					.addGap(35)
-					.addComponent(player2field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(41, Short.MAX_VALUE))
-		);
-		player2panel.setLayout(gl_player2panel);
+		frame.getContentPane().add(player1panel);
+		player1panel.setLayout(null);
 		
 		JPanel player1field = new JPanel();
-		GroupLayout gl_player1panel = new GroupLayout(player1panel);
-		gl_player1panel.setHorizontalGroup(
-			gl_player1panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_player1panel.createSequentialGroup()
-					.addGap(30)
-					.addComponent(player1field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(27, Short.MAX_VALUE))
-		);
-		gl_player1panel.setVerticalGroup(
-			gl_player1panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_player1panel.createSequentialGroup()
-					.addGap(35)
-					.addComponent(player1field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(46, Short.MAX_VALUE))
-		);
-		player1panel.setLayout(gl_player1panel);
+		player1field.setBounds(52, 36, 331, 370);
+		player1field.setLayout(new GridLayout(10, 10, 0, 0));
+		player1panel.add(player1field);
 		
-		JPanel[][] player1polje = new JPanel[10][10];
-		player1field.setLayout(new GridLayout(10, 10));
+		JPanel player1NumbersPanel = new JPanel();
+		player1NumbersPanel.setBounds(52, 7, 331, 30);
+		player1NumbersPanel.setLayout(new GridLayout(1, 10, 0, 0));
+		player1panel.add(player1NumbersPanel);
+		
+		JPanel player1LettersPanel = new JPanel();
+		player1LettersPanel.setBounds(23, 36, 30, 370);
+		player1LettersPanel.setLayout(new GridLayout(10, 1, 0, 0));
+		player1panel.add(player1LettersPanel);
+		
+		JPanel player2panel = new JPanel();
+		player2panel.setBounds(409, 0, 395, 418);
+		player2panel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
+		frame.getContentPane().add(player2panel);
+		player2panel.setLayout(null);
+		
+		JPanel player2field = new JPanel();
+		player2field.setBounds(12, 36, 331, 370);
+		player2field.setLayout(new GridLayout(10, 10, 0, 0));
+		player2panel.add(player2field);
+		
+		JPanel player2NumbersPanel = new JPanel();
+		player2NumbersPanel.setBounds(12, 7, 331, 30);
+		player2NumbersPanel.setLayout(new GridLayout(1, 10, 0, 0));
+		player2panel.add(player2NumbersPanel);
+		
+		JPanel player2LettersPanel = new JPanel();
+		player2LettersPanel.setBounds(342, 36, 30, 370);
+		player2LettersPanel.setLayout(new GridLayout(10, 1, 0, 0));
+		player2panel.add(player2LettersPanel);
+		
+		JLabel[] player1Brojevi = new JLabel[10];
+		JLabel[] player2Brojevi = new JLabel[10];
+		JLabel[] player1Slova = new JLabel[10];
+		JLabel[] player2Slova = new JLabel[10];
+		Integer integer = 1;
+		Character character = 'A';
+		
+		for(int i=0; i<10; i++) {
+			player1Brojevi[i] = new JLabel(integer.toString());
+			player1Brojevi[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player1Brojevi[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player1Brojevi[i].setVerticalAlignment(SwingConstants.CENTER);
+			player1NumbersPanel.add(player1Brojevi[i]);
+			player2Brojevi[i] = new JLabel(integer.toString());
+			player2Brojevi[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player2Brojevi[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player2Brojevi[i].setVerticalAlignment(SwingConstants.CENTER);
+			player2NumbersPanel.add(player2Brojevi[i]);
+			integer++;
+			
+			player1Slova[i] = new JLabel(character.toString());
+			player1Slova[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player1Slova[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player1Slova[i].setVerticalAlignment(SwingConstants.CENTER);
+			player1LettersPanel.add(player1Slova[i]);
+			player2Slova[i] = new JLabel(character.toString());
+			player2Slova[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player2Slova[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player2Slova[i].setVerticalAlignment(SwingConstants.CENTER);
+			player2LettersPanel.add(player2Slova[i]);
+			character++;
+		}
+		
+		JPanel shipPanel = new JPanel();
+		shipPanel.setBounds(12, 430, 768, 47);
+		shipPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.BLACK));
+		shipPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		frame.getContentPane().add(shipPanel);
+		
+		JLabel feedbackLabel = new JLabel("Dobro dosli u potapanje brodova!");
+		feedbackLabel.setBounds(12, 489, 654, 66);
+		feedbackLabel.setOpaque(true);
+		feedbackLabel.setBackground(Color.WHITE);
+		feedbackLabel.setBorder(BorderFactory.createLoweredBevelBorder());
+		feedbackLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		feedbackLabel.setVerticalAlignment(SwingConstants.TOP);
+		frame.getContentPane().add(feedbackLabel);
+		
+		JButton btnQuitGame = new JButton("Quit game");
+		btnQuitGame.setBounds(684, 489, 96, 27);
+		frame.getContentPane().add(btnQuitGame);
+		
+		JButton btnRageQuit = new JButton("Rage quit");
+		btnRageQuit.setBounds(684, 528, 96, 27);
+		frame.getContentPane().add(btnRageQuit);
+		
+		JPanel[][] player1Cells = new JPanel[10][10];	
 		
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++){
-				player1polje[i][j] = new JPanel();
-				player1polje[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-				player1polje[i][j].setBackground(Color.blue);
-				player1polje[i][j].setPreferredSize(new Dimension(37, 37));
-				player1field.add(player1polje[i][j]);
-				player1polje[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+				ImagePanel panel = new ImagePanel();
+				panel.setCoords(i, j);
+				player1Cells[i][j] = panel;
+				player1Cells[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+				player1Cells[i][j].setBackground(Color.BLUE);
+				player1field.add(player1Cells[i][j]);
+				player1Cells[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			}
 		}
 		
-		JPanel[][] player2polje = new JPanel[10][10];
-		player2field.setLayout(new GridLayout(10, 10));
+		JPanel[][] player2Cells = new JPanel[10][10];	
 		
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++){
-				player2polje[i][j] = new JPanel();
-				player2polje[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-				player2polje[i][j].setBackground(Color.blue);
-				player2polje[i][j].setPreferredSize(new Dimension(37, 37));
-				player2field.add(player2polje[i][j]);
-				player2polje[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+				ImagePanel panel = new ImagePanel();
+				panel.setCoords(i, j);
+				player2Cells[i][j] = panel;
+				player2Cells[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+				player2Cells[i][j].setBackground(Color.BLUE);
+				player2field.add(player2Cells[i][j]);
+				player2Cells[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			}
 		}
-		
-		/*JPanel test = new JPanel();
-		test.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-		test.setBackground(Color.blue);
-		test.setPreferredSize(new Dimension(37, 37));
-		player1field.add(test);
-		test.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));*/
-		
-		frame.getContentPane().setLayout(groupLayout);
 	}
 }

@@ -1,296 +1,378 @@
 package view;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
-import model.Ship;
-import model.ShipType;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
-public class View{
-	private JFrame frame;
-	private JPanel player1panel;
-	private JPanel player2panel;
-	private JPanel panel;
-	private JLabel textLabel;
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+
+public class View {
+	private JFrame mainFrame;
 	
-	private JButton btnStartGame;
-	private JButton btnExit;
+	private JButton btnPvAI;
+	private JButton btnPvP;
+	private JButton btnHighScores;
+	private JButton btnExitGame;
+	
 	private JButton btnRageQuit;
 	private JButton btnQuitGame;
+	private JPanel shipPanel;
+	private JLabel feedbackLabel;
 	
-	public JPanel[][] player1polje;
-	public JPanel[][] player2polje;
+	private JPanel shotsPanel;
+	private JPanel timePanel;
+	private JLabel lblScore;
+	private JButton btnMainMenu;
 	
+	public ImagePanel[][] player1Cells;
+	public ImagePanel[][] player2Cells;
+
+	public static BufferedImage BG;
+	public static BufferedImage HIGHSCORESBG;
+	public static BufferedImage MISS;
+	public static BufferedImage EXPLOSION;
+
+	static {
+		try {
+			BG = ImageIO.read(View.class.getResourceAsStream("bg.jpg"));
+			HIGHSCORESBG = ImageIO.read(View.class.getResourceAsStream("highScoreBg.jpg"));
+			EXPLOSION = ImageIO.read(View.class.getResourceAsStream("explosion.png"));
+			MISS = ImageIO.read(View.class.getResourceAsStream("miss.png"));
+		} catch (IOException ex) {
+			System.err.println(ex.getMessage());
+		}
+	}
+
 	public View() {
 		makeFrame();
 		showMenu();
 	}
-	
-	public void makeFrame() {
-		frame = new JFrame("BattleShip");
-		//frame.setIconImage(Toolkit.getDefaultToolkit().getImage(View.class.getResource("/com/sun/java/swing/plaf/gtk/icons/File.gif")));
-		frame.setSize(800, 600);
-		frame.getContentPane().setBackground(new Color(0, 191, 255));
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		BufferedImage bg_img = null;
-		/*try {
-			bg_img = ImageIO.read(new File("bg.jpg"));
-		} catch(IOException e) {
-			e.printStackTrace();
-		}*/
-		
-		//Graphics g = bg_img.getGraphics();
-		//g.drawImage(bg_img, 0, 0, null);
-		
-		/*try {
-			frame.setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("bg.jpg")))));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-		
-		//JLabel background = new JLabel(new ImageIcon("../../resources/bg.jpg"));
-		//frame.add(background);
+
+	private void makeFrame() {
+		mainFrame = new JFrame("BattleShip");
+		mainFrame.setBounds(50, 50, 800, 600);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	public void showMenu() {
-		JPanel panel = new JPanel();
-		panel.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-		panel.setBackground(new Color(0, 0, 255));
-		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-					.addGap(200)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-					.addGap(200))
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(50)
-					.addComponent(panel, GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
-					.addGap(50))
-		);
+		ImagePanel bgPanel = new ImagePanel();
+		bgPanel.setBounds(0, 0, 800, 600);
+		bgPanel.setImage(BG);
+		mainFrame.getContentPane().add(bgPanel, BorderLayout.CENTER);
+		bgPanel.setLayout(null);
+
+		JPanel menuPanel = new JPanel();
+		menuPanel.setBounds(250, 75, 300, 400);
+		menuPanel.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		menuPanel.setBackground(new Color(89, 128, 166));
+		bgPanel.add(menuPanel);
+		menuPanel.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("BattleShip");
-		lblNewLabel.setFont(new Font("Dialog", Font.BOLD, 26));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		JLabel titleLabel = new JLabel("BattleShip");
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		titleLabel.setBounds(12, 28, 276, 48);
+		titleLabel.setFont(new Font("Dialog", Font.BOLD, 32));
+		menuPanel.add(titleLabel);
+
+		btnExitGame = new JButton("Exit game");
+		btnExitGame.setBounds(50, 340, 200, 27);
+		menuPanel.add(btnExitGame);
 		
-		btnStartGame = new JButton("Start game");
+		btnHighScores = new JButton("High scores");
+		btnHighScores.setBounds(50, 300, 200, 27);
+		menuPanel.add(btnHighScores);
 		
-		btnExit = new JButton("Exit");
-		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(20)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnExit, GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-						.addComponent(btnStartGame, GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-						.addComponent(lblNewLabel, GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE))
-					.addGap(20))
-		);
-		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
-					.addComponent(btnStartGame)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnExit)
-					.addGap(56))
-		);
-		panel.setLayout(gl_panel);
-		frame.getContentPane().setLayout(groupLayout);
-		frame.setVisible(true);
+		btnPvP = new JButton("Player vs. Player");
+		btnPvP.setBounds(50, 260, 200, 27);
+		menuPanel.add(btnPvP);
+		
+		btnPvAI = new JButton("Player vs. AI");
+		btnPvAI.setBounds(50, 220, 200, 27);
+		menuPanel.add(btnPvAI);
+		
+		mainFrame.getContentPane().add(bgPanel);
+		mainFrame.setVisible(true);
 	}
 	
 	public void showGame() {
-		player1panel = new JPanel();
-		player1panel.setBackground(Color.CYAN);
+		JPanel player1panel = new JPanel();
+		player1panel.setBounds(0, 0, 395, 418);
 		player1panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.BLACK));
-		
-		player2panel = new JPanel();
-		player2panel.setBackground(Color.CYAN);
-		player2panel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
-		
-		panel = new JPanel();
-		panel.setOpaque(false);
-		panel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.BLACK));
-		
-		btnRageQuit = new JButton("Rage quit!");
-		
-		btnQuitGame = new JButton("Quit game");
-		
-		textLabel = new JLabel("Welcome to a game of Battleship!");
-		textLabel.setOpaque(true);
-		textLabel.setBackground(Color.WHITE);
-		textLabel.setBorder(BorderFactory.createLoweredBevelBorder());
-		textLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		textLabel.setVerticalAlignment(SwingConstants.TOP);
-		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(player1panel, GroupLayout.PREFERRED_SIZE, 392, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(player2panel, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(textLabel, GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(btnQuitGame, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnRageQuit, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addContainerGap())
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panel, GroupLayout.DEFAULT_SIZE, 768, Short.MAX_VALUE)
-					.addContainerGap())
-		);
-		player1panel.setBackground(Color.CYAN);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(player2panel, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
-						.addComponent(player1panel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnQuitGame)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnRageQuit))
-						.addComponent(textLabel, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
-		);
-		
-		JPanel player2field = new JPanel();
-		GroupLayout gl_player2panel = new GroupLayout(player2panel);
-		gl_player2panel.setHorizontalGroup(
-			gl_player2panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_player2panel.createSequentialGroup()
-					.addContainerGap(32, Short.MAX_VALUE)
-					.addComponent(player2field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addGap(30))
-		);
-		gl_player2panel.setVerticalGroup(
-			gl_player2panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_player2panel.createSequentialGroup()
-					.addGap(35)
-					.addComponent(player2field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(41, Short.MAX_VALUE))
-		);
-		player2panel.setLayout(gl_player2panel);
+		mainFrame.getContentPane().add(player1panel);
+		player1panel.setLayout(null);
 		
 		JPanel player1field = new JPanel();
-		GroupLayout gl_player1panel = new GroupLayout(player1panel);
-		gl_player1panel.setHorizontalGroup(
-			gl_player1panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_player1panel.createSequentialGroup()
-					.addGap(30)
-					.addComponent(player1field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(27, Short.MAX_VALUE))
-		);
-		gl_player1panel.setVerticalGroup(
-			gl_player1panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_player1panel.createSequentialGroup()
-					.addGap(35)
-					.addComponent(player1field, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(46, Short.MAX_VALUE))
-		);
-		player1panel.setLayout(gl_player1panel);
+		player1field.setBounds(52, 36, 331, 370);
+		player1field.setLayout(new GridLayout(10, 10, 0, 0));
+		player1panel.add(player1field);
 		
-		player1polje = new JPanel[10][10];
-		player1field.setLayout(new GridLayout(10, 10));
+		JPanel player1NumbersPanel = new JPanel();
+		player1NumbersPanel.setBounds(52, 7, 331, 30);
+		player1NumbersPanel.setLayout(new GridLayout(1, 10, 0, 0));
+		player1panel.add(player1NumbersPanel);
+		
+		JPanel player1LettersPanel = new JPanel();
+		player1LettersPanel.setBounds(23, 36, 30, 370);
+		player1LettersPanel.setLayout(new GridLayout(10, 1, 0, 0));
+		player1panel.add(player1LettersPanel);
+		
+		JPanel player2panel = new JPanel();
+		player2panel.setBounds(409, 0, 395, 418);
+		player2panel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
+		mainFrame.getContentPane().add(player2panel);
+		player2panel.setLayout(null);
+		
+		JPanel player2field = new JPanel();
+		player2field.setBounds(12, 36, 331, 370);
+		player2field.setLayout(new GridLayout(10, 10, 0, 0));
+		player2panel.add(player2field);
+		
+		JPanel player2NumbersPanel = new JPanel();
+		player2NumbersPanel.setBounds(12, 7, 331, 30);
+		player2NumbersPanel.setLayout(new GridLayout(1, 10, 0, 0));
+		player2panel.add(player2NumbersPanel);
+		
+		JPanel player2LettersPanel = new JPanel();
+		player2LettersPanel.setBounds(342, 36, 30, 370);
+		player2LettersPanel.setLayout(new GridLayout(10, 1, 0, 0));
+		player2panel.add(player2LettersPanel);
+		
+		JLabel[] player1Brojevi = new JLabel[10];
+		JLabel[] player2Brojevi = new JLabel[10];
+		JLabel[] player1Slova = new JLabel[10];
+		JLabel[] player2Slova = new JLabel[10];
+		Integer integer = 1;
+		Character character = 'A';
+		
+		for(int i=0; i<10; i++) {
+			player1Brojevi[i] = new JLabel(integer.toString());
+			player1Brojevi[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player1Brojevi[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player1Brojevi[i].setVerticalAlignment(SwingConstants.CENTER);
+			player1NumbersPanel.add(player1Brojevi[i]);
+			player2Brojevi[i] = new JLabel(integer.toString());
+			player2Brojevi[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player2Brojevi[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player2Brojevi[i].setVerticalAlignment(SwingConstants.CENTER);
+			player2NumbersPanel.add(player2Brojevi[i]);
+			integer++;
+			
+			player1Slova[i] = new JLabel(character.toString());
+			player1Slova[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player1Slova[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player1Slova[i].setVerticalAlignment(SwingConstants.CENTER);
+			player1LettersPanel.add(player1Slova[i]);
+			player2Slova[i] = new JLabel(character.toString());
+			player2Slova[i].setFont(new Font("Dialog", Font.BOLD, 18));
+			player2Slova[i].setHorizontalAlignment(SwingConstants.CENTER);
+			player2Slova[i].setVerticalAlignment(SwingConstants.CENTER);
+			player2LettersPanel.add(player2Slova[i]);
+			character++;
+		}
+		
+		shipPanel = new JPanel();
+		shipPanel.setBounds(12, 430, 768, 47);
+		shipPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.BLACK));
+		mainFrame.getContentPane().add(shipPanel);
+		
+		feedbackLabel = new JLabel("Posložite brodove na svoje polje. Tipkom 'space' mijenjate orijentaciju broda.");
+		feedbackLabel.setBounds(12, 489, 654, 66);
+		feedbackLabel.setOpaque(true);
+		feedbackLabel.setBackground(Color.WHITE);
+		feedbackLabel.setBorder(BorderFactory.createLoweredBevelBorder());
+		feedbackLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		feedbackLabel.setVerticalAlignment(SwingConstants.TOP);
+		mainFrame.getContentPane().add(feedbackLabel);
+		
+		btnQuitGame = new JButton("Quit game");
+		btnQuitGame.setBounds(684, 489, 96, 27);
+		mainFrame.getContentPane().add(btnQuitGame);
+		
+		btnRageQuit = new JButton("Rage quit");
+		btnRageQuit.setBounds(684, 528, 96, 27);
+		mainFrame.getContentPane().add(btnRageQuit);
+		
+		player1Cells = new ImagePanel[10][10];
+		player2Cells = new ImagePanel[10][10];	
 		
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++){
-				player1polje[i][j] = new JPanel();
-				player1polje[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-				player1polje[i][j].setBackground(Color.BLUE);
-				player1polje[i][j].setPreferredSize(new Dimension(37, 37));
-				player1field.add(player1polje[i][j]);
-				player1polje[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+				player1Cells[i][j] = new ImagePanel();
+				player1Cells[i][j].setCoords(i, j);
+				player1Cells[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+				player1Cells[i][j].setBackground(Color.BLUE);
+				player1field.add(player1Cells[i][j]);
+				player1Cells[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			}
 		}
-		
-		player2polje = new JPanel[10][10];
-		player2field.setLayout(new GridLayout(10, 10));
 		
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++){
-				player2polje[i][j] = new JPanel();
-				player2polje[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-				player2polje[i][j].setBackground(Color.BLUE);
-				player2polje[i][j].setPreferredSize(new Dimension(37, 37));
-				player2field.add(player2polje[i][j]);
-				player2polje[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+				player2Cells[i][j] = new ImagePanel();
+				player2Cells[i][j].setCoords(i, j);
+				player2Cells[i][j].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+				player2Cells[i][j].setBackground(Color.BLUE);
+				player2field.add(player2Cells[i][j]);
+				player2Cells[i][j].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			}
 		}
 		
-		frame.getContentPane().setLayout(groupLayout);
+		mainFrame.getContentPane().setLayout(null);
+		mainFrame.setVisible(true);
 	}
 	
-	//TODO: adds a ship button to panel
-	public ShipButton addShipButton(Ship ship){
-		//create new ship button
-		ShipButton button = new ShipButton(ship);
-		panel.add(button);
-		//return so controller can add listener to button
-		return button;
+	public void showHighScores() {
+		ImagePanel bgPanel = new ImagePanel();
+		bgPanel.setImage(HIGHSCORESBG);
+		bgPanel.setBounds(0, 0, 800, 567);
+		mainFrame.getContentPane().add(bgPanel);
+		bgPanel.setLayout(null);
+		
+		JPanel contentPanel = new JPanel();
+		contentPanel.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		contentPanel.setBackground(new Color(0, 64, 255));
+		contentPanel.setBounds(150, 50, 500, 480);
+		bgPanel.add(contentPanel);
+		contentPanel.setLayout(null);
+		
+		JLabel lblHighScores = new JLabel("High Scores");
+		lblHighScores.setVerticalAlignment(SwingConstants.BOTTOM);
+		lblHighScores.setForeground(Color.WHITE);
+		lblHighScores.setBounds(5, 5, 490, 48);
+		lblHighScores.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHighScores.setFont(new Font("Dialog", Font.BOLD, 26));
+		contentPanel.add(lblHighScores);
+		
+		JLabel lblPvAI = new JLabel("(isključivo player vs AI)");
+		lblPvAI.setVerticalAlignment(SwingConstants.TOP);
+		lblPvAI.setForeground(Color.WHITE);
+		lblPvAI.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPvAI.setFont(new Font("Dialog", Font.BOLD, 14));
+		lblPvAI.setBounds(5, 56, 490, 32);
+		contentPanel.add(lblPvAI);
+		
+		shotsPanel = new JPanel();
+		shotsPanel.setBounds(5, 89, 245, 330);
+		shotsPanel.setBackground(new Color(0, 64, 255));
+		contentPanel.add(shotsPanel);
+		shotsPanel.setLayout(null);
+
+		timePanel = new JPanel();
+		timePanel.setBounds(250, 89, 245, 330);
+		timePanel.setBackground(new Color(0, 64, 255));
+		contentPanel.add(timePanel);
+		timePanel.setLayout(null);
+		
+		JLabel lblShootText = new JLabel("Igre sa najmanje poteza");
+		lblShootText.setForeground(Color.WHITE);
+		lblShootText.setHorizontalAlignment(SwingConstants.CENTER);
+		lblShootText.setFont(new Font("Dialog", Font.BOLD, 16));
+		lblShootText.setBounds(0, 0, 200, 50);
+		shotsPanel.add(lblShootText);
+		
+		JLabel lblTimeText = new JLabel("Igre sa najkraćim vremenom");
+		lblTimeText.setForeground(Color.WHITE);
+		lblTimeText.setHorizontalAlignment(SwingConstants.LEFT);
+		lblTimeText.setFont(new Font("Dialog", Font.BOLD, 16));
+		lblTimeText.setBounds(0, 0, 245, 50);
+		timePanel.add(lblTimeText);
+		
+		lblScore = new JLabel("");
+		lblScore.setForeground(Color.WHITE);
+		lblScore.setHorizontalAlignment(SwingConstants.LEFT);
+		lblScore.setFont(new Font("Dialog", Font.BOLD, 16));
+		lblScore.setBounds(5, 423, 378, 45);
+		contentPanel.add(lblScore);
+		
+		btnMainMenu = new JButton("Main menu");
+		btnMainMenu.setBounds(380, 431, 96, 27);
+		contentPanel.add(btnMainMenu);
+		
+		mainFrame.getContentPane().setLayout(null);
+		mainFrame.setVisible(true);
 	}
 	
-	public String showDialogBox() {
+	public String nameInputDialogBox() {
 		String s = new String();
 		
 		do {
 			s = (String)JOptionPane.showInputDialog(
-					frame,
-					"Unesite ime:",
+					mainFrame,
+					"Unesite ime (mora početi velikim slovom):",
 					"Unos imena igrača",
 					JOptionPane.PLAIN_MESSAGE);
 		}
-		while(s.isEmpty());
+		while(!s.matches("[A-Z].+"));
 		
-		return s;
+		return s.trim();
 	}
 	
-	public JFrame getFrame() {
-		return frame;
+	public JFrame getMainFrame() {
+		return mainFrame;
 	}
-	
-	public JLabel getTextLabel() {
-		return textLabel;
+
+	public JButton getBtnPvAI() {
+		return btnPvAI;
 	}
-	
-	public JButton getBtnStartGame() {
-		return btnStartGame;
+
+	public JButton getBtnPvP() {
+		return btnPvP;
 	}
-	
-	public JButton getBtnExit() {
-		return btnExit;
+
+	public JButton getBtnStatistics() {
+		return btnHighScores;
 	}
-	
+
+	public JButton getBtnExitGame() {
+		return btnExitGame;
+	}
+
+	public JButton getBtnRageQuit() {
+		return btnRageQuit;
+	}
+
 	public JButton getBtnQuitGame() {
 		return btnQuitGame;
 	}
-	
-	public JButton getBtnRageQuit() {
-		return btnRageQuit;
+
+	public JPanel getShipPanel() {
+		return shipPanel;
+	}
+
+	public JLabel getFeedbackLabel() {
+		return feedbackLabel;
+	}
+
+	public JButton getBtnHighScores() {
+		return btnHighScores;
+	}
+
+	public JPanel getShotsPanel() {
+		return shotsPanel;
+	}
+
+	public JPanel getTimePanel() {
+		return timePanel;
+	}
+
+	public JLabel getLblScore() {
+		return lblScore;
+	}
+
+	public JButton getBtnMainMenu() {
+		return btnMainMenu;
 	}
 }

@@ -1,0 +1,6 @@
+Gortan,44,103
+Sirota,59,102
+Žbuka,60,99
+Sozos,47,80
+Matija,54,162
+Brodar,45,82

@@ -1,35 +1,35 @@
 package model;
 
 public class Ship {
-	private Orientation orientation;
 	private ShipType type;
+	private int health;
 	
 	public Ship(ShipType type) {
-		this.orientation = Orientation.HORIZONTAL;
-		this.type = type;		
+		this.type = type;
+		this.health = type.getSize();
 	}
-	public void changeOrientation() {
-		if(this.orientation == Orientation.VERTICAL) {
-			this.orientation = Orientation.HORIZONTAL;
-		}
-		else { this.orientation = Orientation.VERTICAL; }
-	}
-
-	public Orientation getOrientation() {
-		return orientation;
+	
+	public void takeDamage() {
+		this.health -= 1;
+	};
+	
+	public boolean isDestroyed() {
+		return health==0;
 	}
 
-	public String getName(){
+	public ShipType getShipType() {
+		return type;
+	}
+
+	public int getHealth() {
+		return health;
+	}
+	
+	public String getName() {
 		return type.getName();
 	}
 	
-	public int getSize(){
+	public int getSize() {
 		return type.getSize();
-	}
-	
-	//override toString for better output
-	@Override
-	public String toString(){
-		return "Ship{name="+getName()+", size="+getSize()+"}";
 	}
 }
